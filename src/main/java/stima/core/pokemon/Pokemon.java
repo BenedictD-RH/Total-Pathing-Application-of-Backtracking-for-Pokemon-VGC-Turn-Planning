@@ -1,17 +1,21 @@
 package stima.core.pokemon;
 
 import java.util.EnumMap;
+import java.util.List;
+
+import stima.core.moves.Move;
 
 public class Pokemon {
-    private PokemonSpecies species;
-    private Nature nature;
-    private EnumMap<Stat, Integer> ev;
-    
+    private final PokemonSpecies species;
+    private final Nature nature;
+    private final EnumMap<Stat, Integer> ev;
+    private final List<Move> moves;
 
-    public Pokemon(PokemonSpecies species, Nature nature, EnumMap<Stat, Integer> ev) {
+    public Pokemon(PokemonSpecies species, Nature nature, EnumMap<Stat, Integer> ev, List<Move> moves) {
         this.species = species;
         this.nature = nature;
         this.ev = ev;
+        this.moves = moves;
     }
 
     public String getName() {
@@ -24,5 +28,9 @@ public class Pokemon {
 
     public int getStat(Stat stat) {
         return stat.calculateStat(species.getBaseStats().get(stat), ev.get(stat), nature);
+    }
+
+    public List<Move> getMoves() {
+        return moves;
     }
 }

@@ -1,10 +1,11 @@
 package stima.core.status.volatiles;
 
-import stima.core.status.properties.HealPerTurn;
+import stima.core.pokemon.PokemonBattleState;
+import stima.core.properties.HealPerTurn;
 
 public class OvertimeHealing extends VolatileStatus implements HealPerTurn {
     @Override
-    public float healPercentage() {
-        return 0.0625f;
+    public int applyHeal(PokemonBattleState pokemon) {
+        return pokemon.applyPercentageHeal(0.0625f);
     }
 }

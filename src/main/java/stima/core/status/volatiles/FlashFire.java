@@ -2,7 +2,7 @@ package stima.core.status.volatiles;
 
 import stima.core.moves.Move;
 import stima.core.pokemon.Type;
-import stima.core.status.properties.EffectsOutgoingDamage;
+import stima.core.properties.EffectsOutgoingDamage;
 
 public class FlashFire extends VolatileStatus implements EffectsOutgoingDamage {
     @Override

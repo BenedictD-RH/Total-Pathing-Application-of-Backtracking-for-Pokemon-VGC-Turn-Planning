@@ -30,4 +30,8 @@ public class Typing {
     public boolean isSingleType() {
         return secondaryType == null;
     }
+
+    public boolean isType(Type type) {
+        return primaryType == type || secondaryType == type;
+    }
 }

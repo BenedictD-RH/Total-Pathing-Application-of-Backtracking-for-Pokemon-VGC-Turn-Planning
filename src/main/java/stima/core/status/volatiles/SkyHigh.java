@@ -3,9 +3,6 @@ package stima.core.status.volatiles;
 import stima.core.moves.Move;
 
 public class SkyHigh extends TwoTurnInvulnerable {
-    public SkyHigh(Move moveUsed) {
-        super(moveUsed);
-    }
 
     @Override
     public float damageModifier(Move move) {

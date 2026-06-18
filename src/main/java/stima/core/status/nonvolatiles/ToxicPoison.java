@@ -1,16 +1,25 @@
 package stima.core.status.nonvolatiles;
 
-import stima.core.status.properties.DamagePerTurn;
-import stima.core.status.properties.Resettable;
+import stima.core.pokemon.PokemonBattleState;
+import stima.core.properties.DamagePerTurn;
+import stima.core.properties.Resettable;
 
 public class ToxicPoison extends NonVolatileStatus implements DamagePerTurn, Resettable {
-    private float currentDamagePercentage = 0.0625f;
+    private float currentDamagePercentage;
+
+    public ToxicPoison() {
+        this.currentDamagePercentage = 0.0625f;
+    }
+
+    public ToxicPoison(ToxicPoison other) {
+        this.currentDamagePercentage = other.currentDamagePercentage;
+    }
 
     @Override
-    public float damagePercentage() {
-        float damageNow = currentDamagePercentage;
-        currentDamagePercentage *= 2;
-        return damageNow;
+    public int dealDamage(PokemonBattleState pokemon) {
+        int damageDone =  pokemon.applyPercentageDamage(currentDamagePercentage);
+        currentDamagePercentage*=2;
+        return damageDone;
     }
 
     @Override

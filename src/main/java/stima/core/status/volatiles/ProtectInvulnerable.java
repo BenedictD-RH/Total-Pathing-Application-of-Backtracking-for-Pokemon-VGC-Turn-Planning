@@ -1,12 +1,18 @@
 package stima.core.status.volatiles;
 
 import stima.core.moves.Move;
-import stima.core.status.properties.EffectsIncomingDamage;
-import stima.core.status.properties.EndsAtEndOfTurn;
+import stima.core.pokemon.PokemonBattleState;
+import stima.core.properties.EndsAtEndOfTurn;
+import stima.core.properties.GivesImmunity;
 
-public class ProtectInvulnerable extends VolatileStatus implements EffectsIncomingDamage, EndsAtEndOfTurn {
+public class ProtectInvulnerable extends VolatileStatus implements GivesImmunity, EndsAtEndOfTurn {
     @Override
-    public float damageModifier(Move move) {
+    public boolean isImmune(Move move, PokemonBattleState pokemon) {
+        return move.targetsOpponents();
+    }
+
+    @Override
+    public int endsAfter() {
         return 0;
     }
 }

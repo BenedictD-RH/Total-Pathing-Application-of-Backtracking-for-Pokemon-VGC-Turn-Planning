@@ -1,11 +1,11 @@
 package stima.core.status.nonvolatiles;
 
-import stima.core.status.properties.ChanceToEnd;
-import stima.core.status.properties.FixedEffected;
-import stima.core.status.properties.FixedToEnd;
-import stima.core.status.properties.Immobilizing;
+import stima.core.properties.ChanceToEnd;
+import stima.core.properties.EndsBeforePokemonTurn;
+import stima.core.properties.FixedEffected;
+import stima.core.properties.Immobilizing;
 
-public class Sleep extends NonVolatileStatus implements ChanceToEnd, FixedToEnd, Immobilizing, FixedEffected {
+public class Sleep extends NonVolatileStatus implements ChanceToEnd, EndsBeforePokemonTurn, Immobilizing, FixedEffected {
     @Override
     public float endChance() {
         return 0.25f;
