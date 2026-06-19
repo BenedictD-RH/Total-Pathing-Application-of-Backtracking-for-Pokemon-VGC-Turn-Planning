@@ -33,6 +33,10 @@ public class TeamState {
         return team.stream().filter(e -> e.getHealth() > 0).toList();
     }
 
+    public List<PokemonBattleState> getAllPokemon() {
+        return team;
+    }
+
     public List<PokemonBattleState> getDownedPokemon() {
         return team.stream().filter(e -> e.getHealth() <= 0).toList();
     }

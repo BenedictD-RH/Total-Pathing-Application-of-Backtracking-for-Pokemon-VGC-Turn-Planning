@@ -15,7 +15,10 @@ public class MoveAction extends Action {
     private boolean targetOpposingTeam;
     private int targetSlot;
 
-    public MoveAction(int userSlot, int moveSlot, boolean targetOpposingTeam, int targetSlot) {
+    public MoveAction(int userSlot, 
+                    int moveSlot, 
+                    boolean targetOpposingTeam, 
+                    int targetSlot) {
         this.userSlot = userSlot;
         this.moveSlot = moveSlot;
         this.targetOpposingTeam = targetOpposingTeam;
@@ -23,10 +26,21 @@ public class MoveAction extends Action {
     }
 
     @Override
-    public boolean canDoAction(TeamState team, TeamState opposingTeam) {
-        Move move = team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getMove();
-        for (Object restriction : team.getPokemonOnSlot(userSlot).getStatusesWithProperty(RestrictsMoveChoice.class)) {
-            if (!((RestrictsMoveChoice) restriction).canUseMove(move, team.getPokemonOnSlot(userSlot))) {
+    public boolean canDoAction(
+        TeamState team, 
+        TeamState opposingTeam) {
+        Move move = team.getPokemonOnSlot(userSlot)
+                        .getMoves()
+                        .get(moveSlot)
+                        .getMove();
+        for (Object restriction : 
+            team.getPokemonOnSlot(userSlot)
+                .getStatusesWithProperty
+                (RestrictsMoveChoice.class)) {
+            if (!((RestrictsMoveChoice) restriction)
+                .canUseMove(
+                    move, 
+                    team.getPokemonOnSlot(userSlot))) {
                 return false;
             }
         }
@@ -34,15 +48,27 @@ public class MoveAction extends Action {
             return false;
         }
 
-        if (team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getPP() <= 0) {
+        if (team.getPokemonOnSlot(userSlot)
+                .getMoves()
+                .get(moveSlot)
+                .getPP() <= 0) {
             return false;
         }
 
-        if (team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getMove() == Move.FAKE_OUT && team.getPokemonOnSlot(userSlot).getLastAction() != null) {
+        if (team.getPokemonOnSlot(userSlot)
+            .getMoves().get(moveSlot)
+            .getMove() == Move.FAKE_OUT && 
+            team.getPokemonOnSlot(userSlot)
+            .getLastAction() != null) {
             return false;
         }
 
-        if (team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getMove() == Move.PROTECT && team.getPokemonOnSlot(userSlot).getConsecutiveProtects() > 0) {
+        if (team.getPokemonOnSlot(userSlot)
+            .getMoves()
+            .get(moveSlot)
+            .getMove() == Move.PROTECT && 
+            team.getPokemonOnSlot(userSlot)
+            .getConsecutiveProtects() > 0) {
             return false;
         }
 

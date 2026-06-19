@@ -15,11 +15,16 @@ public class SwitchAction extends Action {
     }
 
     @Override
-    public boolean canDoAction(TeamState team, TeamState opposingTeam) {
-        return !team.getPokemonOnSlot(switchFromSlot).hasStatusWithProperty(CannotSwitch.class) && 
-               !team.getPokemonOnSlot(switchFromSlot).hasStatusWithProperty(SkipsTurnChoice.class) &&
+    public boolean canDoAction(
+                    TeamState team, 
+                    TeamState opposingTeam) {
+        return !team.getPokemonOnSlot(switchFromSlot)
+                    .hasStatusWithProperty(CannotSwitch.class) && 
+               !team.getPokemonOnSlot(switchFromSlot)
+                    .hasStatusWithProperty(SkipsTurnChoice.class) &&
                 team.getPokemonOnSlot(switchToSlot).isAlive() &&
-                team.getAlivePokemon().size() > 2;
+                switchFromSlot != switchToSlot &&
+                (switchToSlot != 1 && switchToSlot != 0);
     }
 
     @Override

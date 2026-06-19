@@ -10,7 +10,7 @@ import stima.core.battle.TurnManager;
 public class TreeBuilder {
     private int winConditionFound = 0;
     public TreeNode buildActionNodes(BattleState currentState, int currentDepth, int userSlot, int teamID, int maxDepth, String edgeLog) {
-        TreeNode node = new TreeNode(currentState, currentDepth, userSlot == 0 && teamID == 0, edgeLog);
+        TreeNode node = new TreeNode(currentState, currentDepth, userSlot == 0 && teamID == 0, edgeLog, true);
         if (currentState.teamWins(0)) {
             System.out.println("Win Condition Found : " + ++winConditionFound);
             return node;
@@ -49,7 +49,7 @@ public class TreeBuilder {
 
 
     public TreeNode buildOrderNodes(BattleState currentState, int currentDepth, int order, int maxDepth, String edgeLog) {
-        TreeNode node = new TreeNode(currentState, currentDepth, false, edgeLog);
+        TreeNode node = new TreeNode(currentState, currentDepth, false, edgeLog, false);
         if (currentState.teamWins(0)) {
             System.out.println("Win Condition Found : " + ++winConditionFound);
             return node;

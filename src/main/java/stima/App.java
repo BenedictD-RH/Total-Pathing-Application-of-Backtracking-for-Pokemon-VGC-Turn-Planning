@@ -102,7 +102,7 @@ public class App extends Application {
         Pokemon pokemon4 = new Pokemon(species4, 
                                        Nature.ADAMANT, 
                                        evs4, 
-                                       List.of(Move.CLOSE_COMBAT, Move.ROCK_SLIDE, Move.FAKE_OUT, Move.PROTECT), 
+                                       List.of(Move.CLOSE_COMBAT, Move.DIRE_CLAW, Move.FAKE_OUT, Move.PROTECT), 
                                        new WhiteHerb(),
                                        new Unburden());
                                         
@@ -111,9 +111,12 @@ public class App extends Application {
         TeamState team2 = new TeamState(1, List.of(pokemon3, pokemon4));
         BattleState battle = new BattleState(team1, team2, field);
         TreeBuilder treeBuilder = new TreeBuilder();
-        TreeNode node = treeBuilder.buildRoot(battle, 1);
-        //node.getFlattenedTree().printTree();
-        TreeView.showTree(primaryStage, node);
+        TreeNode node = treeBuilder.buildRoot(battle, 2);
+        if (node != null) {
+            TreeView.showTree(primaryStage, node);
+        } else {
+            System.out.println("No Win conditions found");
+        }
     }
 
     public static void main(String[] args) throws Exception {

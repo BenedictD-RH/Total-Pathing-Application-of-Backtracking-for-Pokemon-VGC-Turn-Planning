@@ -12,15 +12,17 @@ public class TreeNode {
     private BattleState state;
     private List<TreeNode> children;
     private boolean checkpointNode;
+    private boolean actionNode;
     private String edgeLog;
 
-    public TreeNode(BattleState state, int depth, boolean checkpointNode, String edgeLog) {
+    public TreeNode(BattleState state, int depth, boolean checkpointNode, String edgeLog, boolean actionNode) {
         this.nodeID = currID++;
         this.state = state;
         this.depth = depth;
         this.children = new ArrayList<>();
         this.checkpointNode = checkpointNode;
         this.edgeLog = edgeLog;
+        this.actionNode = actionNode;
     }
 
     public TreeNode(TreeNode other) {
@@ -86,5 +88,13 @@ public class TreeNode {
 
     public String getEdgeLog() {
         return edgeLog;
+    }
+
+    public Boolean isActionNode() {
+        return actionNode;
+    }
+
+    public Boolean isTurnOrderNode() {
+        return !actionNode;
     }
 }

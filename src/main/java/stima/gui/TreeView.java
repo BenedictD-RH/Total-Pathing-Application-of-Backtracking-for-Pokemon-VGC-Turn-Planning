@@ -45,7 +45,7 @@ public class TreeView {
 
     private static StackPane createNodeView(TreeNode node, TreeViewNode viewNode) {
         StackPane stack = new StackPane();
-        StackPane rootNode = createVisualNode(Integer.toString(node.getNodeID()), node.getEdgeLog() + "\n" + node.getBattleState().getBattleStateLog());
+        StackPane rootNode = createVisualNode(node.isActionNode(), Integer.toString(node.getNodeID()), node.getEdgeLog() + "\n" + node.getBattleState().getBattleStateLog());
         viewNode.setElement(rootNode);
         
         HBox hBox = new HBox(rootNode);
@@ -112,8 +112,8 @@ public class TreeView {
         drawingPane.getChildren().addAll(visibleLine, hitboxLine);
     }
 
-    private static StackPane createVisualNode(String text, String tooltipString) {
-        Circle circle = new Circle(15, Color.LIGHTBLUE);
+    private static StackPane createVisualNode(boolean actionNode, String text, String tooltipString) {
+        Circle circle = new Circle(15, actionNode ? Color.LIGHTBLUE : Color.GOLDENROD);
         circle.setStroke(Color.DARKBLUE);
         
         String nodeLabel = text.contains(":") ? text.substring(text.lastIndexOf(":") + 1).trim() : text;
