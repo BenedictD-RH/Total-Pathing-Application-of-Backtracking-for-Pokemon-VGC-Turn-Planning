@@ -25,4 +25,10 @@ public class Sleep extends NonVolatileStatus implements ChanceToEnd, EndsBeforeP
     public int fixedEffectFor() {
         return 1;
     }
+
+    @Override
+    public String effectLog() {
+        return " woke up.";
+    }
+
 }

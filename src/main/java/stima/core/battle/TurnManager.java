@@ -8,9 +8,10 @@ import stima.core.properties.DamagePerTurn;
 import stima.core.properties.EndsAtEndOfTurn;
 import stima.core.properties.EndsAtStartOfTurn;
 import stima.core.properties.HealPerTurn;
+import stima.core.properties.TriggerWhenSwitchIn;
 
 public class TurnManager {
-    private record BattleIdx(int teamID, int teamSlotID) {}
+    public record BattleIdx(int teamID, int teamSlotID) {}
     private BattleState state;
 
     public TurnManager(BattleState state) {
@@ -27,13 +28,22 @@ public class TurnManager {
         return turnOrder.stream().sorted((e1, e2) -> getPokemon(e1).movesBefore(getPokemon(e2))).toList();
     }
 
-    private PokemonBattleState getPokemon(BattleIdx id) {
+    public PokemonBattleState getPokemon(BattleIdx id) {
         return state.getTeam(id.teamID()).getPokemonOnSlot(id.teamSlotID());
+    }
+
+    public BattleState getCurrentState() {
+        return state;
     }
 
     public void turnStart() {
         for (BattleIdx id  : getTurnOrder()) {
             getPokemon(id).updateStatusCounter(EndsAtStartOfTurn.class, null);
+            if (getPokemon(id).getLastAction() == null) {
+                if (getPokemon(id).getAbility() instanceof TriggerWhenSwitchIn) {
+                    getPokemon(id).getAbility().applyEffect(getPokemon(id), null, state);
+                }
+            }
         }
     }
 

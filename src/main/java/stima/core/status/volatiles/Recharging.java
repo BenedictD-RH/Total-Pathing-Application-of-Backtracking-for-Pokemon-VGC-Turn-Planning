@@ -16,6 +16,11 @@ public class Recharging extends VolatileStatus implements Immobilizing, SkipsTur
     }
 
     @Override
+    public String effectLog() {
+        return "";
+    }
+
+    @Override
     public int skipFor() {
         return 1;
     }

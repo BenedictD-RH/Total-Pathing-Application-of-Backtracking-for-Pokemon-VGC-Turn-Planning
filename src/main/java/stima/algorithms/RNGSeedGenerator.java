@@ -17,33 +17,48 @@ public class RNGSeedGenerator {
         PokemonBattleState target = targetOpposingTeam ? state.getOpposingTeam(userTeamIdx).getPokemonOnSlot(targetSlot) : state.getTeam(userTeamIdx).getPokemonOnSlot(targetSlot);
         MoveState move = user.getMoves().get(moveSlot);
         int seedLength = 0;
+        List<String> log = new ArrayList<>();
 
         for (Object chance : user.getStatusesWithProperty(RNGDependent.class)) {
             if (chance instanceof Immobilizing) {
                 if (((Immobilizing)chance).immobilizedChance() < 1) {
                     seedLength++;
+                    log.add(user.getPokemon().getName() + " immobilized by " + chance.getClass().getSimpleName());
                 } else {
                     seedLength++;
+                    log.add(user.getPokemon().getName() + ((RNGDependent)chance).effectLog());
                 }
-            }
+            } 
         }
         MoveAction action = new MoveAction(userSlot, moveSlot, targetOpposingTeam, targetSlot);
-        seedLength += (move.getAccuracy(user, target) < 100 ? 1 : 0)*action.getMoveActionTargets(state.getTeam(userTeamIdx), state.getOpposingTeam(userTeamIdx)).size();
+        if (move.getAccuracy(user, target) < 100) {
+            for (PokemonBattleState targetCandidates : action.getMoveActionTargets(state.getTeam(userTeamIdx), state.getOpposingTeam(userTeamIdx))) {
+                seedLength++;
+                log.add(user.getPokemon().getName() + "'s " + move.getMove().name() + " missed on " + targetCandidates.getPokemon().getName());
+            }
+        }
+        
         if (move.getMove().getEffect() != null) {
-            seedLength += move.getMove().getEffect().rngDependentEvents();
+            for (PokemonBattleState targetCandidates : action.getMoveActionTargets(state.getTeam(userTeamIdx), state.getOpposingTeam(userTeamIdx))) {
+                seedLength += move.getMove().getEffect().rngDependentEvents();
+                for (String effectLog : move.getMove().getEffect().rngDependentEventsLog()) {
+                    log.add(targetCandidates.getPokemon().getName() + effectLog);
+                }
+            }
+            
         }
 
         List<RNGSeed> seedStrings = new ArrayList<>();
-        getAllRNGSeeds(seedStrings, "", seedLength);
+        getAllRNGSeeds(seedStrings, "", seedLength, log);
         return seedStrings;
     }
     
-    private static void getAllRNGSeeds(List<RNGSeed> seeds, String seed, int seedLength) {
+    private static void getAllRNGSeeds(List<RNGSeed> seeds, String seed, int seedLength, List<String> seedLog) {
         if (seed.length() == seedLength) {
-            seeds.add(new RNGSeed(seed));
+            seeds.add(new RNGSeed(seed, seedLog));
         } else {
-            getAllRNGSeeds(seeds, seed + "0", seedLength);
-            getAllRNGSeeds(seeds, seed + "1", seedLength);
+            getAllRNGSeeds(seeds, seed + "0", seedLength, seedLog);
+            getAllRNGSeeds(seeds, seed + "1", seedLength, seedLog);
         }
     }
 }

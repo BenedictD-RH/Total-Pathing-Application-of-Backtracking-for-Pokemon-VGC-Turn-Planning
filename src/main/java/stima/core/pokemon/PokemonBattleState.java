@@ -3,18 +3,28 @@ package stima.core.pokemon;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import stima.core.abilities.Ability;
 import stima.core.battle.Action;
 import stima.core.battle.BattlePosition;
 import stima.core.battle.RNGSeed;
 import stima.core.battle.TeamState;
 import stima.core.field.FieldEffect;
+import stima.core.items.HeldItem;
 import stima.core.moves.Move;
 import stima.core.moves.MoveState;
 import stima.core.properties.ChanceToEnd;
+import stima.core.properties.EffectsStat;
 import stima.core.properties.FixedToEnd;
+import stima.core.properties.TriggerWhenDamageKOs;
+import stima.core.properties.TriggerWhenHealthDrops;
+import stima.core.properties.TriggerWhenItemConsumed;
+import stima.core.properties.TriggerWhenNegativeStats;
+import stima.core.properties.TriggerWhenStatDrops;
 import stima.core.status.Status;
 import stima.core.status.nonvolatiles.NonVolatileStatus;
 
@@ -29,7 +39,10 @@ public class PokemonBattleState {
     private final TeamState team;
     private Action chosenAction;
     private Action lastAction;
+    private HeldItem item;
+    private Ability ability;
     private int consecutiveProtects = 0;
+    static private MoveState struggle = new MoveState(Move.STRUGGLE);
 
     public PokemonBattleState(Pokemon pokemon, TeamState team) {
         this.pokemon = pokemon;
@@ -45,6 +58,8 @@ public class PokemonBattleState {
             moves.add(new MoveState(move));
         }
         this.statuses = new HashMap<>(); 
+        this.item = pokemon.getItem();
+        this.ability = pokemon.getAbility();
         this.position = null;
         this.currTyping = pokemon.getTyping();
         this.team = team;
@@ -76,10 +91,13 @@ public class PokemonBattleState {
             this.statuses.put(newS, other.statuses.get(s));
         }
         this.position = null;
+        this.item = other.item;
+        this.ability = other.ability;
         this.currTyping = other.getTyping();
         this.team = copiedTeam;
         this.chosenAction = other.chosenAction;
         this.lastAction = other.lastAction;
+        this.consecutiveProtects = other.consecutiveProtects;
     }
 
     public int getHealth() {
@@ -96,6 +114,18 @@ public class PokemonBattleState {
     public int applyDamage(int damage) {
         int damageDone = damage > health ? health : damage;
         reduceHealth(damageDone);
+        if (item != null) {
+            if (item instanceof TriggerWhenHealthDrops) {
+                if (health <= getMaxHealthPercentage(((TriggerWhenHealthDrops)item).percentageThreshold())) {
+                    item.applyEffect(this);
+                }
+            }
+            if (item instanceof TriggerWhenDamageKOs) {
+                if (damageDone == health) {
+                    item.applyEffect(this);
+                }
+            }
+        }
         return damageDone;
     }
 
@@ -136,6 +166,61 @@ public class PokemonBattleState {
         } else if (statChanges.get(stat) < -6) {
             statChanges.put(stat, -6);
         }
+        if (hasNegativeStatChange()) {
+            if (item != null) {
+                if (item instanceof TriggerWhenNegativeStats) {
+                    item.applyEffect(this);
+                }
+            }
+        }  
+    }
+
+    public boolean hasNegativeStatChange() {
+        for (Stat stat : Stat.values()) {
+            if (stat != Stat.HP) {
+                if (statChanges.get(stat) < 0) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void addStatChange(EnumMap<Stat, Integer> statChange) {
+        if (containsStatDrops(statChange)) {
+            if (ability != null) {
+                if (ability instanceof TriggerWhenStatDrops) {
+                    ability.applyEffect(this, null, null);
+                }
+            }
+        }
+        this.statChanges = new StatChangeBuilder(this.statChanges).append(statChange).build();
+        if (hasNegativeStatChange()) {
+            if (item != null) {
+                if (item instanceof TriggerWhenNegativeStats) {
+                    item.applyEffect(this);
+                }
+            }
+        } 
+    }
+
+    private static boolean containsStatDrops(EnumMap<Stat, Integer> statChange) {
+        for (Stat stat : Stat.values()) {
+            if (stat != Stat.HP) {
+                if (statChange.get(stat) < 0)  {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void resetStatChange() {
+        for (Stat stat : Stat.values()) {
+            if (stat != Stat.HP) {
+                statChanges.put(stat, 0);
+            }
+        }
     }
 
     public void addStatus(Status status) {
@@ -148,7 +233,7 @@ public class PokemonBattleState {
                 return;
             }
         }
-        System.out.println(pokemon.getName() + " has been afflicted with " + status.getClass().getSimpleName());
+        //System.out.println(pokemon.getName() + " has been afflicted with " + status.getClass().getSimpleName());
         statuses.put(status, 0);
     }
 
@@ -157,20 +242,24 @@ public class PokemonBattleState {
     }
 
     public void updateStatusCounter(Class<? extends FixedToEnd> endCheck, RNGSeed probabilities) {
+        Set<Status> removedStatus = new HashSet<>();
         for (Status status : statuses.keySet()) {
             if (endCheck.isInstance(status)) {
                 FixedToEnd fteStatus = (FixedToEnd) status;
                 if (fteStatus.endsAfter() <= statuses.get(status)) {
-                    statuses.remove(status);
+                    removedStatus.add(status);
                 } else {
                     statuses.put(status, statuses.get(status) + 1);
                 }
                 if (fteStatus instanceof ChanceToEnd) {
                     if (probabilities.consume()) {
-                        statuses.remove(status);
+                        removedStatus.add(status);
                     }
                 }
             }
+        }
+        for (Status status : removedStatus) {
+            statuses.remove(status);
         }
     }
 
@@ -208,6 +297,11 @@ public class PokemonBattleState {
 
     public int calculateStat(Stat stat) {
         float statChangeMult = statChanges.get(stat) > 0 ? (1 + statChanges.get(stat)*0.5f) : 1/(1 - statChanges.get(stat)*0.5f);
+        if (item != null) {
+            if (item instanceof EffectsStat) {
+                statChangeMult *= ((EffectsStat)item).statModifier(stat, this);
+            }
+        }
         return (int) Math.floor(pokemon.getStat(stat) * statChangeMult);
     }
 
@@ -264,6 +358,10 @@ public class PokemonBattleState {
         return consecutiveProtects;
     }
 
+    public void setConsecutiveProtects(int n) {
+        consecutiveProtects = n;
+    }
+
     public String getStateLog() {
         StringBuilder state = new StringBuilder(pokemon.getName())
                                   .append("(").append(getHealth())
@@ -280,5 +378,30 @@ public class PokemonBattleState {
         }
 
         return state.toString();
+    }
+
+    public MoveState getStruggle() {
+        return struggle;
+    }
+
+    public HeldItem getItem() {
+        return item;
+    }
+
+    public void setItem(HeldItem item) {
+        if (item == null) {
+            if (ability instanceof TriggerWhenItemConsumed) {
+                ability.applyEffect(this, null, null);
+            }
+        }
+        this.item = item;
+    }
+
+    public Ability getAbility() {
+        return ability;
+    }
+
+    public void setAbility(Ability ability) {
+        this.ability = ability;
     }
 }

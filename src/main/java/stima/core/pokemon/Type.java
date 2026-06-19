@@ -325,6 +325,12 @@ public enum Type {
                     return 1;
             }
         }
+    },
+    TYPELESS {
+        @Override
+        public float attackMultiplier(Type defendingType) {
+           return 1;
+        }
     };
 
     public abstract float attackMultiplier(Type defendingType);

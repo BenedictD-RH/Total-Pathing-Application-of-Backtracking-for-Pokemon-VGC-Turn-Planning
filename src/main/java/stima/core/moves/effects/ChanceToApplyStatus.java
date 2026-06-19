@@ -1,5 +1,8 @@
 package stima.core.moves.effects;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import stima.core.battle.RNGSeed;
 import stima.core.pokemon.PokemonBattleState;
 import stima.core.status.Status;
@@ -22,5 +25,10 @@ public class ChanceToApplyStatus extends ApplyStatusToOpponent {
     @Override
     public int rngDependentEvents() {
         return 1;
+    }
+
+    @Override
+    public List<String> rngDependentEventsLog() {
+        return List.of(" inflicted with " + appliedStatus.getClass().getSimpleName());
     }
 }

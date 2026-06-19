@@ -16,8 +16,10 @@ import stima.core.moves.effects.MultipleEffects;
 import stima.core.moves.effects.NeverMissInWeather;
 import stima.core.moves.effects.PowerUpByDownedAllies;
 import stima.core.moves.effects.SkipChargeTurnInWeather;
+import stima.core.moves.effects.StaticRecoil;
 import stima.core.moves.effects.SuckerPunch;
 import stima.core.pokemon.Stat;
+import stima.core.pokemon.StatChangeBuilder;
 import stima.core.pokemon.Type;
 import stima.core.status.nonvolatiles.Burn;
 import stima.core.status.nonvolatiles.Paralysis;
@@ -31,7 +33,7 @@ import stima.core.status.volatiles.ThroatChopped;
 
 public enum Move {
     AQUA_JET(Type.WATER, 40, 100, 20, MoveCategory.PHYSICAL, null, MoveTarget.SINGLE, 1, true),
-    CLOSE_COMBAT(Type.FIGHTING, 120, 100, 5, MoveCategory.PHYSICAL, new MultipleEffects(new ApplyStatChangeToSelf(Stat.DEF, -1), new ApplyStatChangeToSelf(Stat.SPD, -1)), MoveTarget.SINGLE, 0, true),
+    CLOSE_COMBAT(Type.FIGHTING, 120, 100, 5, MoveCategory.PHYSICAL, new ApplyStatChangeToSelf(new StatChangeBuilder().addStatChange(Stat.DEF, -1).addStatChange(Stat.SPD, -1).build()), MoveTarget.SINGLE, 0, true),
     DIRE_CLAW(Type.POISON, 80, 100, 10, MoveCategory.PHYSICAL, new MultipleEffects(new ChanceToApplyStatus(new Paralysis(), 0.1f), new ChanceToApplyStatus(new Sleep(), 0.1f), new ChanceToApplyStatus(new Poison(), 0.1f)), MoveTarget.SINGLE, 0, true, MoveProperty.SLICE),
     DRAGON_CLAW(Type.DRAGON, 80, 100, 15, MoveCategory.PHYSICAL, null, MoveTarget.SINGLE, 0, true, MoveProperty.SLICE),
     EARTHQUAKE(Type.GROUND, 100, 100, 12, MoveCategory.PHYSICAL, null, MoveTarget.ALL),
@@ -45,6 +47,7 @@ public enum Move {
     ROCK_SLIDE(Type.ROCK, 75, 90, 10, MoveCategory.PHYSICAL, new ChanceToApplyStatus(new Flinch(), 0.3f), MoveTarget.ADJACENT),
     SMACK_DOWN(Type.ROCK, 50, 100, 16, MoveCategory.PHYSICAL, null, MoveTarget.SINGLE),
     SOLAR_BEAM(Type.GRASS, 120, 100, 10, MoveCategory.SPECIAL, new SkipChargeTurnInWeather(new HarshSunlight(-1)), MoveTarget.SINGLE),
+    STRUGGLE(Type.TYPELESS, 50, 101, 999, MoveCategory.PHYSICAL, new StaticRecoil(0.25f), MoveTarget.SINGLE, 0, true),
     SUCKER_PUNCH(Type.DARK, 70, 100, 5, MoveCategory.PHYSICAL, new SuckerPunch(), MoveTarget.SINGLE, 2, true),
     SURF(Type.WATER, 90, 100, 16, MoveCategory.SPECIAL, null, MoveTarget.ALL),
     THROAT_CHOP(Type.DARK, 80, 100, 15, MoveCategory.PHYSICAL, new ApplyStatusToOpponent(new ThroatChopped()), MoveTarget.SINGLE, 0, true),

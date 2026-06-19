@@ -1,6 +1,7 @@
 package stima.core.status.volatiles;
 
 import stima.core.moves.Move;
+import stima.core.pokemon.PokemonBattleState;
 import stima.core.properties.EndsAtEndOfTurn;
 import stima.core.properties.RestrictsMoveChoice;
 
@@ -21,7 +22,7 @@ public class Encored extends VolatileStatus implements EndsAtEndOfTurn, Restrict
     }
 
     @Override
-    public boolean canUseMove(Move move) {
+    public boolean canUseMove(Move move, PokemonBattleState pokemon) {
         return encoredTo == move;
     }
 }

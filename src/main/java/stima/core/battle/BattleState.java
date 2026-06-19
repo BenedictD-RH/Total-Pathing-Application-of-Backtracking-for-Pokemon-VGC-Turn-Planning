@@ -49,6 +49,10 @@ public class BattleState {
         return null;
     }
 
+    public boolean teamWins(int id) {
+        return getOpposingTeam(id).getAlivePokemon().size() == 0;
+    }
+
     public String getBattleStateLog() {
         StringBuilder state = new StringBuilder()
                                   .append(team1.teamStateLog())

@@ -2,6 +2,7 @@ package stima.core.status.volatiles;
 
 import stima.core.moves.Move;
 import stima.core.moves.MoveProperty;
+import stima.core.pokemon.PokemonBattleState;
 import stima.core.properties.FixedToEnd;
 import stima.core.properties.RestrictsMoveChoice;
 
@@ -12,7 +13,7 @@ public class ThroatChopped extends VolatileStatus implements FixedToEnd, Restric
     }
 
     @Override
-    public boolean canUseMove(Move move) {
+    public boolean canUseMove(Move move, PokemonBattleState pokemon) {
         return !move.hasProperty(MoveProperty.SOUND);
     }
 }

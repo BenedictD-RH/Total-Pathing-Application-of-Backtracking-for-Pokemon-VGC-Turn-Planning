@@ -24,4 +24,13 @@ public class MultipleEffects extends MoveEffect {
     public int rngDependentEvents() {
         return effects.stream().map(MoveEffect::rngDependentEvents).reduce((e1, e2) -> e1 + e2).orElse(0);
     }
+
+    @Override
+    public List<String> rngDependentEventsLog() {
+        List<String> log = new ArrayList<>();
+        for (MoveEffect effect : effects) {
+            log.addAll(effect.rngDependentEventsLog());
+        }
+        return log;
+    }
 }

@@ -11,6 +11,11 @@ public class Freeze extends NonVolatileStatus implements ChanceToEnd, EndsBefore
     }
 
     @Override
+    public String effectLog() {
+        return " is unfrozen.";
+    }
+
+    @Override
     public int endsAfter() {
         return 3;
     }

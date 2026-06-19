@@ -14,6 +14,7 @@ import stima.core.properties.EffectsOutgoingDamage;
 import stima.core.properties.EndsAfterPokemonTurn;
 import stima.core.properties.EndsBeforePokemonTurn;
 import stima.core.properties.Immobilizing;
+import stima.core.properties.TriggerOnContact;
 import stima.core.status.volatiles.ProtectInvulnerable;
 
 public class MoveState {
@@ -80,12 +81,18 @@ public class MoveState {
             }
         }
 
+        if (move == Move.PROTECT) {
+            user.setConsecutiveProtects(user.getConsecutiveProtects() + 1);
+        } else {
+            user.setConsecutiveProtects(0);
+        }
+
         for (PokemonBattleState target : targets) {
             boolean miss = move.getAccuracy() < 100 ? probabilities.consume() : false;
             boolean moveSucceeds = true;
             if (move.getEffect() instanceof CanFail) {
                 moveSucceeds = ((CanFail) move.getEffect()).moveSucceeds(user, target, move);
-                if (!moveSucceeds) System.out.println("But it failed!");
+                if (!moveSucceeds); //System.out.println("But it failed!");
             }
 
             if (!immobilized && !target.hasStatus(new ProtectInvulnerable()) && !miss && moveSucceeds) {
@@ -124,14 +131,22 @@ public class MoveState {
                 if (!effectApplied && move.getEffect() != null) {
                     move.getEffect().applyEffect(user, target, damageDone, probabilities);
                 }
+
+                if (move.doesMakeContact()) {
+                    if (target.getAbility() instanceof TriggerOnContact) {
+                        target.getAbility().applyEffect(target, user, null);
+                    }
+                }
             } else if (target.hasStatus(new ProtectInvulnerable())) {
-                System.out.println(target.getPokemon().getName() + " was protected from the attack!");
+                //System.out.println(target.getPokemon().getName() + " was protected from the attack!");
             } else if (miss) {
-                System.out.println(target.getPokemon().getName() + " avoided the attack!");
+                //System.out.println(target.getPokemon().getName() + " avoided the attack!");
             }
         }
         if (immobilized) {
-            System.out.println(user.getPokemon().getName() + " can't move!");
+            //System.out.println(user.getPokemon().getName() + " can't move!");
+        } else {
+            reducePP();
         }
 
         

@@ -14,6 +14,8 @@ public abstract class Action {
 
     abstract public MoveCategory getCategory(TeamState team);
 
+    abstract public String actionLog(TeamState team, TeamState opposingTeam);
+
     public List<RNGSeed> getRNGSeedsForAction(BattleState state, TeamState team) {
         return new ArrayList<>();
     }

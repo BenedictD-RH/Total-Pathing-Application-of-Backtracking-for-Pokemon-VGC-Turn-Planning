@@ -11,6 +11,11 @@ public class TwoTurnMoveStatus extends VolatileStatus implements Immobilizing, S
     }
 
     @Override
+    public String effectLog() {
+        return "";
+    }
+
+    @Override
     public int endsAfter() {
         return 1;
     }

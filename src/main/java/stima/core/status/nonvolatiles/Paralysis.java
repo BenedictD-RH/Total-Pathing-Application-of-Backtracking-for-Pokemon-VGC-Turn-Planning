@@ -15,4 +15,10 @@ public class Paralysis extends NonVolatileStatus implements EffectsStat, Immobil
     public float immobilizedChance() {
         return 0.125f;
     }
+
+    @Override
+    public String effectLog() {
+        return " is paralysed.";
+    }
+
 }

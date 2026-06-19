@@ -10,6 +10,11 @@ public class Flinch extends VolatileStatus implements Immobilizing, EndsAtEndOfT
     }
 
     @Override
+    public String effectLog() {
+        return "";
+    }
+
+    @Override
     public int endsAfter() {
         return 0;
     }

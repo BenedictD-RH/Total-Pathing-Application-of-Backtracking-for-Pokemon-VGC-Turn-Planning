@@ -4,7 +4,7 @@ import stima.core.battle.RNGSeed;
 import stima.core.pokemon.PokemonBattleState;
 
 public class DealsRecoil extends MoveEffect {
-    private final float recoilPercentage;
+    protected final float recoilPercentage;
 
     public DealsRecoil(float recoilPercentage) {
         this.recoilPercentage = recoilPercentage;

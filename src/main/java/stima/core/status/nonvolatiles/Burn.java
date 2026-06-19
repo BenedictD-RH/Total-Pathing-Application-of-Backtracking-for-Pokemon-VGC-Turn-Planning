@@ -13,7 +13,7 @@ public class Burn extends NonVolatileStatus implements DamagePerTurn, EffectsOut
 
     @Override
     public int dealDamage(PokemonBattleState pokemon) {
-        System.out.println(pokemon.getPokemon().getName() + " was hurt by the Burn.");
+        //System.out.println(pokemon.getPokemon().getName() + " was hurt by the Burn.");
         return pokemon.applyPercentageDamage(0.0625f);
     }
 }

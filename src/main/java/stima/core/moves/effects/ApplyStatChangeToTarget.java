@@ -1,20 +1,20 @@
 package stima.core.moves.effects;
 
+import java.util.EnumMap;
+
 import stima.core.battle.RNGSeed;
 import stima.core.pokemon.PokemonBattleState;
 import stima.core.pokemon.Stat;
 
 public class ApplyStatChangeToTarget extends MoveEffect {
-    private final Stat stat;
-    private final int amount;
+    private final EnumMap<Stat, Integer> statChange;
 
-    public ApplyStatChangeToTarget(Stat stat, int amount) {
-        this.stat = stat;
-        this.amount = amount;
+    public ApplyStatChangeToTarget(EnumMap<Stat, Integer> statChange) {
+        this.statChange = statChange;
     }
 
     @Override
     public void applyEffect(PokemonBattleState user, PokemonBattleState target, int damageDone, RNGSeed probabilities) {
-        user.addStatChange(stat, amount);
+        user.addStatChange(statChange);
     }
 }

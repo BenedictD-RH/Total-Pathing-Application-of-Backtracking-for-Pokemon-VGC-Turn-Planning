@@ -26,16 +26,29 @@ public class MoveAction extends Action {
     public boolean canDoAction(TeamState team, TeamState opposingTeam) {
         Move move = team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getMove();
         for (Object restriction : team.getPokemonOnSlot(userSlot).getStatusesWithProperty(RestrictsMoveChoice.class)) {
-            if (!((RestrictsMoveChoice) restriction).canUseMove(move)) {
+            if (!((RestrictsMoveChoice) restriction).canUseMove(move, team.getPokemonOnSlot(userSlot))) {
                 return false;
             }
         }
+        if (!team.getPokemonOnSlot(userSlot).isAlive()) {
+            return false;
+        }
+
         if (team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getPP() <= 0) {
             return false;
         }
+
+        if (team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getMove() == Move.FAKE_OUT && team.getPokemonOnSlot(userSlot).getLastAction() != null) {
+            return false;
+        }
+
+        if (team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getMove() == Move.PROTECT && team.getPokemonOnSlot(userSlot).getConsecutiveProtects() > 0) {
+            return false;
+        }
+
         switch(move.getTarget()) {
             case SINGLE:
-                return targetOpposingTeam || targetSlot != userSlot;
+                return targetOpposingTeam;
             case ADJACENT:
             case ALL:
                 return targetOpposingTeam && targetSlot == userSlot;
@@ -58,8 +71,22 @@ public class MoveAction extends Action {
     }
 
     @Override
+    public String actionLog(TeamState team, TeamState opposingTeam) {
+        List<PokemonBattleState> targets = getMoveActionTargets(team, opposingTeam);
+        StringBuilder moveLog = new StringBuilder(team.getPokemonOnSlot(userSlot).getPokemon().getName())
+                                    .append(" chooses to use ")
+                                    .append(team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getMove().name())
+                                    .append(" on ").append(getTargetNames(targets));
+        return moveLog.toString();
+    }
+
+    @Override
     public MoveCategory getCategory(TeamState team) {
         return team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getCategory(team.getPokemonOnSlot(userSlot));
+    }
+
+    public Move getMove(TeamState team) {
+        return team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getMove();
     }
     
     public List<PokemonBattleState> getMoveActionTargets(TeamState team, TeamState opposingTeam) {
@@ -69,6 +96,8 @@ public class MoveAction extends Action {
                 TeamState targetTeam = targetOpposingTeam ? opposingTeam : team;
                 if (targetTeam.getPokemonOnSlot(targetSlot).isAlive()) {
                     targets.add(targetTeam.getPokemonOnSlot(targetSlot));
+                } else if (targetOpposingTeam && !targetTeam.getPokemonOnSlot(targetSlot).isAlive()) {
+                    targets.add(targetTeam.getPokemonOnSlot(targetSlot == 1 ? 0 : 1));
                 }
                 break;
             case ADJACENT :
@@ -127,13 +156,8 @@ public class MoveAction extends Action {
     @Override
     public void commitAction(TeamState team, TeamState opposingTeam, RNGSeed seed) {
         List<PokemonBattleState> targets = getMoveActionTargets(team, opposingTeam);
-        StringBuilder moveLog = new StringBuilder(team.getPokemonOnSlot(userSlot).getPokemon().getName())
-                                    .append("(").append(team.getPokemonOnSlot(userSlot).getHealth())
-                                    .append("/").append(team.getPokemonOnSlot(userSlot).getMaxHealth())
-                                    .append("HP) used ")
-                                    .append(team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot).getMove().name())
-                                    .append(" on ").append(getTargetNames(targets));
-        System.out.println(moveLog.toString());
+        
+        //System.out.println(moveLog.toString());
         team.getPokemonOnSlot(userSlot).getMoves().get(moveSlot)
             .useMove(team.getPokemonOnSlot(userSlot), targets, seed);
     }

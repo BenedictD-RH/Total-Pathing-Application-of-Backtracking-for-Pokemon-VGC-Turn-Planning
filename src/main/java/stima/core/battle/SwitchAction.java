@@ -33,6 +33,11 @@ public class SwitchAction extends Action {
     }
 
     @Override
+    public String actionLog(TeamState team, TeamState opposingTeam) {
+        return "";
+    }
+
+    @Override
     public void commitAction(TeamState team, TeamState opposingTeam, RNGSeed seed) {
         System.out.println(team.getPokemonOnSlot(switchFromSlot).getPokemon().getName() + " switched to " + team.getPokemonOnSlot(switchFromSlot).getPokemon().getName());
         PokemonBattleState temp = team.getPokemonOnSlot(switchFromSlot);
